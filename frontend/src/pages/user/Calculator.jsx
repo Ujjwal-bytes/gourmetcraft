@@ -81,7 +81,7 @@ const QuantityCalculator = () => {
             </select>
           </div>
 
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Required Portions <span className="text-red-500">*</span>
             </label>
@@ -97,6 +97,30 @@ const QuantityCalculator = () => {
               <button
                 onClick={handleCalculate}
                 className="px-6 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl transition-all"
+              >
+                Calculate
+              </button>
+            </div>
+          </div> */}
+
+
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              Required Portions <span className="text-red-500">*</span>
+            </label>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <input
+                type="number"
+                min="1"
+                value={requiredQuantity}
+                onChange={(e) => setRequiredQuantity(e.target.value)}
+                placeholder="Enter quantity"
+                className="w-full px-4 py-3 sm:py-2.5 border border-gray-200 rounded-xl text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+              <button
+                onClick={handleCalculate}
+                className="w-full sm:w-auto min-w-[120px] px-6 py-3 sm:py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white font-medium rounded-xl transition-all active:scale-95"
               >
                 Calculate
               </button>

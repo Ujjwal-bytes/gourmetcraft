@@ -1,10 +1,3 @@
-import dns from "dns";
-
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
-
-import mongoose from "mongoose";
-import dotenv from "dotenv";
-
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -24,9 +17,10 @@ import recipeRoutes from './routes/recipeRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
 import dns from 'dns';
 
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
-// Load env vars
+// Load env vars - MUST be before any other imports that use env vars
 dotenv.config();
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 // Connect to database
 connectDB();
