@@ -131,7 +131,7 @@ const Login = () => {
           </form>
 
           {/* Demo credentials hint */}
-          <div className="mt-6 pt-5 border-t border-gray-100">
+          {/* <div className="mt-6 pt-5 border-t border-gray-100">
             <p className="text-xs text-gray-400 text-center mb-3 font-medium">Demo Credentials</p>
             <div className="grid grid-cols-2 gap-3">
               <button
@@ -149,7 +149,7 @@ const Login = () => {
                 User Login
               </button>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Footer */}

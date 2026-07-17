@@ -1,3 +1,10 @@
+import dns from "dns";
+
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
+import mongoose from "mongoose";
+import dotenv from "dotenv";
+
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
@@ -15,7 +22,9 @@ import subMenuRoutes from './routes/subMenuRoutes.js';
 import ingredientRoutes from './routes/ingredientRoutes.js';
 import recipeRoutes from './routes/recipeRoutes.js';
 import dashboardRoutes from './routes/dashboardRoutes.js';
+import dns from 'dns';
 
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 // Load env vars
 dotenv.config();
 
