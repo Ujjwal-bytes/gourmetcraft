@@ -1,4 +1,5 @@
 import { HiMenuAlt2 } from 'react-icons/hi';
+import { FaUtensils } from 'react-icons/fa';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -52,7 +53,7 @@ const Header = ({ onToggleSidebar, pageTitle }) => {
 
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500">
-            <span className="text-lg">🍳</span>
+            <FaUtensils className="w-5 h-5 text-emerald-500" />
             <span className="font-medium text-emerald-600">GourmetCraft</span>
           </div>
           <div className="flex items-center gap-2 pl-3 border-l border-gray-200">

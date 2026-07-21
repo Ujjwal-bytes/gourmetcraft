@@ -46,7 +46,6 @@ const Login = () => {
         {/* Logo & Branding */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-3 justify-center px-5 py-3 bg-emerald-50 rounded-2xl mb-4 border border-emerald-100">
-            {/* <span className="text-3xl">🍳</span> */}
              <FaUtensils className="w-7 h-7 text-emerald-500" />
             <span className="text-2xl font-bold text-emerald-600 tracking-tight">GourmetCraft</span>
           </div>

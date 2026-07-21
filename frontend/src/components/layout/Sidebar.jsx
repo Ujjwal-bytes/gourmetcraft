@@ -1,5 +1,6 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import { FaUtensils } from 'react-icons/fa';
 import {
   HiViewGrid,
   HiCollection,
@@ -59,7 +60,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
           {/* Logo */}
           <div className="flex items-center justify-between px-6 py-5 border-b border-gray-100">
             <div className="flex items-center gap-3">
-              <span className="text-2xl">🍳</span>
+              <FaUtensils className="w-6 h-6 text-emerald-500" />
               <span className="text-xl font-bold text-emerald-600 tracking-tight">
                 GourmetCraft
               </span>
