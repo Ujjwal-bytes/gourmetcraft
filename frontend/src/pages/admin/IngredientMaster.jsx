@@ -6,6 +6,7 @@ import Modal from '../../components/common/Modal';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { HiPencil, HiTrash, HiPlus } from 'react-icons/hi';
+import { formatCurrency } from '../../utils/currency';
 
 const IngredientMaster = () => {
   const [ingredients, setIngredients] = useState([]);
@@ -123,7 +124,7 @@ const IngredientMaster = () => {
       <span className="text-gray-600">{row.quantityUnit}</span>
     )},
     { header: 'Unit Price', render: (row) => (
-      <span className="font-medium text-gray-700">${row.unitPrice.toFixed(2)}</span>
+      <span className="font-medium text-gray-700">{formatCurrency(row.unitPrice)}</span>
     )},
     { header: 'Waste %', render: (row) => (
       <span className="text-gray-600">{row.wastePercent}%</span>
@@ -175,6 +176,9 @@ const IngredientMaster = () => {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
+        loading={loading}
+        emptyTitle="No ingredients found"
+        emptyDescription="Get started by adding your first ingredient!"
         actions={(row) => (
           <>
             <button

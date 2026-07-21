@@ -9,17 +9,21 @@ export const getRecipes = async (req, res, next) => {
     const limit = parseInt(req.query.limit, 10) || 50;
     const skip = (page - 1) * limit;
     const search = req.query.search || req.query.q || '';
+    const { menu, subMenu } = req.query;
 
     const query = { isActive: true };
     if (search) {
       query.name = { $regex: search, $options: 'i' };
     }
+    if (menu) query.menuId = menu;
+    if (subMenu) query.subMenuId = subMenu;
 
     const recipes = await Recipe.find(query)
       .populate('menuId', 'name')
       .populate('subMenuId', 'name')
       .populate('ingredients.ingredientId', 'name')
       .populate('createdBy', 'name')
+      .populate('updatedBy', 'name')
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -41,7 +45,8 @@ export const getRecipe = async (req, res, next) => {
       .populate('menuId', 'name')
       .populate('subMenuId', 'name')
       .populate('ingredients.ingredientId', 'name quantityUnit unitPrice wastePercent nutritionValue')
-      .populate('createdBy', 'name');
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name');
 
     if (!recipe) {
       return res
@@ -61,11 +66,14 @@ export const getRecipe = async (req, res, next) => {
 export const createRecipe = async (req, res, next) => {
   try {
     req.body.createdBy = req.user.id;
+    req.body.updatedBy = req.user.id;
     const recipe = await Recipe.create(req.body);
     const populated = await recipe.populate([
       { path: 'menuId', select: 'name' },
       { path: 'subMenuId', select: 'name' },
       { path: 'ingredients.ingredientId', select: 'name' },
+      { path: 'createdBy', select: 'name' },
+      { path: 'updatedBy', select: 'name' },
     ]);
     res.status(201).json({ success: true, data: populated });
   } catch (error) {
@@ -78,13 +86,16 @@ export const createRecipe = async (req, res, next) => {
 // @access  Private/Admin
 export const updateRecipe = async (req, res, next) => {
   try {
+    req.body.updatedBy = req.user.id;
     const recipe = await Recipe.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
       runValidators: true,
     })
       .populate('menuId', 'name')
       .populate('subMenuId', 'name')
-      .populate('ingredients.ingredientId', 'name');
+      .populate('ingredients.ingredientId', 'name')
+      .populate('createdBy', 'name')
+      .populate('updatedBy', 'name');
 
     if (!recipe) {
       return res
@@ -180,6 +191,45 @@ export const calculateRecipe = async (req, res, next) => {
       nutritionValue: ing.nutritionValue,
     }));
 
+    // Calculate summary
+    const totalCost = scaledIngredients.reduce((sum, ing) => sum + ing.ingredientCost, 0);
+    const costPerPortion = parseFloat((totalCost / requiredQuantity).toFixed(2));
+    const totalYieldQuantity = scaledIngredients.reduce((sum, ing) => sum + ing.yieldQuantity, 0);
+
+    // Format totalBatchWeight
+    let totalBatchWeight;
+    let yieldUnit;
+    if (totalYieldQuantity >= 1000) {
+      totalBatchWeight = `${(totalYieldQuantity / 1000).toFixed(1)} KG`;
+      yieldUnit = "KG";
+    } else {
+      totalBatchWeight = `${totalYieldQuantity.toFixed(1)} G`;
+      yieldUnit = "G";
+    }
+
+    // Aggregate nutrition
+    const nutritionValues = scaledIngredients.filter(ing => ing.nutritionValue).map(ing => ing.nutritionValue);
+    const totalNutrition = nutritionValues.length > 0 ? nutritionValues.join(" | ") : "N/A";
+
+    // Calculate potential food cost
+    const salesPricePerPortion = recipe.salesPricePerPortion || 0;
+    let potentialFoodCost = 0;
+    if (salesPricePerPortion > 0) {
+      potentialFoodCost = parseFloat(((costPerPortion / salesPricePerPortion) * 100).toFixed(2));
+    }
+
+    const summary = {
+      totalCost: parseFloat(totalCost.toFixed(2)),
+      costPerPortion,
+      totalBatchWeight,
+      totalNutrition,
+      potentialFoodCost,
+      salesPricePerPortion,
+      ingredientCount: scaledIngredients.length,
+      totalYieldQuantity: parseFloat(totalYieldQuantity.toFixed(2)),
+      yieldUnit,
+    };
+
     res.status(200).json({
       success: true,
       data: {
@@ -193,6 +243,7 @@ export const calculateRecipe = async (req, res, next) => {
           scaleFactor: parseFloat(scaleFactor.toFixed(2)),
         },
         scaledIngredients,
+        summary,
       },
     });
   } catch (error) {

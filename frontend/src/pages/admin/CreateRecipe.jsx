@@ -4,6 +4,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import API from '../../api/axios';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { HiTrash, HiPlus } from 'react-icons/hi';
+import { formatCurrency } from '../../utils/currency';
 
 const CreateRecipe = () => {
   const { id } = useParams();
@@ -24,6 +25,10 @@ const CreateRecipe = () => {
     subMenuId: '',
     portions: '',
     batchWeight: '',
+    salesPricePerPortion: '',
+    potentialFoodCost: '',
+    totalNutritionValue: '',
+    nutritionValuePerBatch: '',
     ingredients: [],
     methodOfPreparation: '',
     specialInstructions: '',
@@ -55,6 +60,10 @@ const CreateRecipe = () => {
           subMenuId: recipe.subMenuId?._id || '',
           portions: recipe.portions.toString(),
           batchWeight: recipe.batchWeight || '',
+          salesPricePerPortion: recipe.salesPricePerPortion?.toString() || '',
+          potentialFoodCost: recipe.potentialFoodCost?.toString() || '',
+          totalNutritionValue: recipe.totalNutritionValue || '',
+          nutritionValuePerBatch: recipe.nutritionValuePerBatch || '',
           ingredients: recipe.ingredients.map((ing) => ({
             ingredientId: ing.ingredientId?._id || ing.ingredientId,
             quantity: ing.quantity.toString(),
@@ -155,6 +164,8 @@ const CreateRecipe = () => {
     const payload = {
       ...form,
       portions: parseInt(form.portions),
+      salesPricePerPortion: parseFloat(form.salesPricePerPortion) || 0,
+      potentialFoodCost: parseFloat(form.potentialFoodCost) || 0,
       ingredients: ingredientsPayload,
     };
 
@@ -291,6 +302,63 @@ const CreateRecipe = () => {
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
               />
             </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Sales Price Per Portion
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={form.salesPricePerPortion}
+                onChange={(e) => setForm({ ...form, salesPricePerPortion: e.target.value })}
+                placeholder="e.g., 24.00"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Potential Food Cost (%)
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                max="100"
+                value={form.potentialFoodCost}
+                onChange={(e) => setForm({ ...form, potentialFoodCost: e.target.value })}
+                placeholder="e.g., 46.88"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Total Nutrition Value
+              </label>
+              <input
+                type="text"
+                value={form.totalNutritionValue}
+                onChange={(e) => setForm({ ...form, totalNutritionValue: e.target.value })}
+                placeholder="e.g., 850 CAL"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                Nutrition Value Per Portion
+              </label>
+              <input
+                type="text"
+                value={form.nutritionValuePerBatch}
+                onChange={(e) => setForm({ ...form, nutritionValuePerBatch: e.target.value })}
+                placeholder="e.g., 425 CAL"
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              />
+            </div>
           </div>
         </div>
 
@@ -357,10 +425,10 @@ const CreateRecipe = () => {
                           className="w-full px-3 py-2 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
                         />
                       </td>
-                      <td className="px-4 py-3.5 text-sm text-gray-600">${calculated.unitPrice.toFixed(2)}</td>
+                      <td className="px-4 py-3.5 text-sm text-gray-600">{formatCurrency(calculated.unitPrice)}</td>
                       <td className="px-4 py-3.5 text-sm text-gray-600">{calculated.wastePercent}%</td>
                       <td className="px-4 py-3.5 text-sm text-gray-600">{calculated.yieldQuantity.toFixed(2)}</td>
-                      <td className="px-4 py-3.5 text-sm text-gray-600">${calculated.ingredientCost.toFixed(2)}</td>
+                      <td className="px-4 py-3.5 text-sm text-gray-600">{formatCurrency(calculated.ingredientCost)}</td>
                       <td className="px-4 py-3.5 text-sm text-gray-500 text-xs">{calculated.nutritionValue || '—'}</td>
                       <td className="px-4 py-3.5">
                         <button
@@ -376,6 +444,23 @@ const CreateRecipe = () => {
                 })}
               </tbody>
             </table>
+          </div>
+          {/* Cost Summary Card */}
+          <div className="bg-emerald-50 rounded-xl p-4 mt-4 border border-emerald-100 flex justify-between items-center">
+            <div>
+              <p className="text-sm text-emerald-600 font-medium">Total Recipe Cost</p>
+              <p className="text-2xl font-bold text-emerald-800">
+                {formatCurrency(form.ingredients.reduce((sum, ing) => sum + calculateIngredient(ing).ingredientCost, 0))}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-emerald-600 font-medium">Cost Per Portion</p>
+              <p className="text-2xl font-bold text-emerald-800">
+                {formatCurrency(form.portions && parseInt(form.portions) > 0 
+                    ? form.ingredients.reduce((sum, ing) => sum + calculateIngredient(ing).ingredientCost, 0) / parseInt(form.portions) 
+                    : 0)}
+              </p>
+            </div>
           </div>
         </div>
 

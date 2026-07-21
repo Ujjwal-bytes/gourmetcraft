@@ -41,7 +41,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
       {/* Mobile overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden"
+          className="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 lg:hidden no-print"
           onClick={onClose}
         />
       )}
@@ -52,6 +52,7 @@ const Sidebar = ({ isOpen, onClose, role }) => {
           w-64
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
           lg:translate-x-0 lg:static lg:z-auto
+          no-print
         `}
       >
         <div className="flex flex-col h-full">

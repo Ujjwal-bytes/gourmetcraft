@@ -8,12 +8,23 @@ import User from '../models/User.js';
 // @access  Private
 export const getStats = async (req, res, next) => {
   try {
-    const [totalRecipes, totalIngredients, totalMenus, activeUsers] =
+    const [totalRecipes, totalIngredients, totalMenus, activeUsers, recentRecipes, topIngredients] =
       await Promise.all([
-        Recipe.countDocuments(),
-        Ingredient.countDocuments(),
-        Menu.countDocuments(),
+        Recipe.countDocuments({ isActive: true }),
+        Ingredient.countDocuments({ isActive: true }),
+        Menu.countDocuments({ isActive: true }),
         User.countDocuments(),
+        Recipe.find({ isActive: true }).sort({ createdAt: -1 }).limit(5).populate('menuId', 'name').populate('subMenuId', 'name'),
+        Recipe.aggregate([
+          { $match: { isActive: true } },
+          { $unwind: '$ingredients' },
+          { $group: { _id: '$ingredients.ingredientId', usageCount: { $sum: 1 } } },
+          { $sort: { usageCount: -1 } },
+          { $limit: 5 },
+          { $lookup: { from: 'ingredients', localField: '_id', foreignField: '_id', as: 'ingredientDetails' } },
+          { $unwind: '$ingredientDetails' },
+          { $project: { _id: 1, name: '$ingredientDetails.name', unit: '$ingredientDetails.quantityUnit', usageCount: 1 } }
+        ])
       ]);
 
     res.status(200).json({
@@ -23,6 +34,8 @@ export const getStats = async (req, res, next) => {
         totalIngredients,
         totalMenus,
         activeUsers,
+        recentRecipes,
+        topIngredients,
       },
     });
   } catch (error) {

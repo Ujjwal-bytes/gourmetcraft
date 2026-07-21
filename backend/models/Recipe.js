@@ -69,6 +69,31 @@ const recipeSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    salesPricePerPortion: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+    potentialFoodCost: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+    totalNutritionValue: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    nutritionValuePerBatch: {
+      type: String,
+      trim: true,
+      default: '',
+    },
+    updatedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
     ingredients: [recipeIngredientSchema],
     methodOfPreparation: {
       type: String,
@@ -86,8 +111,43 @@ const recipeSchema = new mongoose.Schema(
       default: true,
     },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true },
+  }
 );
+
+// Virtual fields for calculations
+recipeSchema.virtual('weightPerPortion').get(function() {
+  if (!this.batchWeight || !this.portions) return null;
+  // Parse batchWeight and calculate
+  const weightMatch = this.batchWeight.match(/([0-9.]+)/);
+  if (!weightMatch) return null;
+  const weight = parseFloat(weightMatch[1]);
+  const unit = this.batchWeight.replace(/[0-9.]/g, '').trim();
+  return `${(weight / this.portions).toFixed(1)} ${unit}`;
+});
+
+recipeSchema.virtual('totalRecipeCost').get(function() {
+  return this.ingredients.reduce((sum, ing) => sum + (ing.ingredientCost || 0), 0);
+});
+
+recipeSchema.virtual('costPerPortion').get(function() {
+  const total = this.totalRecipeCost;
+  return this.portions > 0 ? parseFloat((total / this.portions).toFixed(2)) : 0;
+});
+
+recipeSchema.virtual('ingredientCostTotal').get(function() {
+  return this.ingredients.reduce((sum, ing) => sum + (ing.ingredientCost || 0), 0);
+});
+
+recipeSchema.virtual('calculatedFoodCostPercent').get(function() {
+  if (this.salesPricePerPortion > 0 && this.costPerPortion > 0) {
+    return parseFloat(((this.costPerPortion / this.salesPricePerPortion) * 100).toFixed(2));
+  }
+  return 0;
+});
 
 recipeSchema.index({ name: 1 });
 

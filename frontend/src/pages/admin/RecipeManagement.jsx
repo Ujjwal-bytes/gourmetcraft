@@ -7,23 +7,43 @@ import DataTable from '../../components/common/DataTable';
 import ConfirmDialog from '../../components/common/ConfirmDialog';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { HiEye, HiPencil, HiTrash, HiPlus } from 'react-icons/hi';
+import { getCategoryDisplay } from '../../utils/recipeHelpers';
 
 const RecipeManagement = () => {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [menus, setMenus] = useState([]);
+  const [subMenus, setSubMenus] = useState([]);
+  const [selectedMenu, setSelectedMenu] = useState('');
+  const [selectedSubMenu, setSelectedSubMenu] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, id: null });
   const navigate = useNavigate();
 
+  const fetchFilters = async () => {
+    try {
+      const [menuRes, subMenuRes] = await Promise.all([
+        API.get('/api/menus'),
+        API.get('/api/submenus')
+      ]);
+      setMenus(menuRes.data.data);
+      setSubMenus(subMenuRes.data.data);
+    } catch (error) {
+      console.error('Failed to fetch filters:', error);
+    }
+  };
+
   useEffect(() => {
     document.title = 'Recipe Management — GourmetCraft Admin';
+    fetchFilters();
   }, []);
 
   const fetchRecipes = async () => {
     try {
-      const res = await API.get(`/api/recipes?page=${page}&limit=10&search=${searchQuery}`);
+      setLoading(true);
+      const res = await API.get(`/api/recipes?page=${page}&limit=10&search=${searchQuery}&menu=${selectedMenu}&subMenu=${selectedSubMenu}`);
       setRecipes(res.data.data);
       if (res.data.total) setTotalPages(Math.ceil(res.data.total / 10));
     } catch (error) {
@@ -35,7 +55,7 @@ const RecipeManagement = () => {
 
   useEffect(() => {
     fetchRecipes();
-  }, [page, searchQuery]);
+  }, [page, searchQuery, selectedMenu, selectedSubMenu]);
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -55,8 +75,7 @@ const RecipeManagement = () => {
   const columns = [
     { header: 'Recipe Name', render: (row) => <span className="font-medium text-gray-900">{row.name}</span> },
     { header: 'Recipe Group', render: (row) => <span className="text-gray-500">{row.recipeGroup || '—'}</span> },
-    { header: 'Menu', render: (row) => <span className="text-emerald-700">{row.menuId?.name || '—'}</span> },
-    { header: 'Sub Menu', render: (row) => <span className="text-gray-600">{row.subMenuId?.name || '—'}</span> },
+    { header: 'Category', render: (row) => <span className="text-gray-700">{getCategoryDisplay(row)}</span> },
     { header: 'Portions', render: (row) => <span className="text-gray-700">{row.portions}</span> },
     { header: 'Batch Weight', render: (row) => <span className="text-gray-600">{row.batchWeight || '—'}</span> },
   ];
@@ -85,6 +104,30 @@ const RecipeManagement = () => {
         </button>
       </div>
 
+      {/* Filters */}
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+        <select
+          value={selectedMenu}
+          onChange={(e) => { setSelectedMenu(e.target.value); setSelectedSubMenu(''); setPage(1); }}
+          className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+        >
+          <option value="">All Menus</option>
+          {menus.map((m) => (
+            <option key={m._id} value={m._id}>{m.name}</option>
+          ))}
+        </select>
+        <select
+          value={selectedSubMenu}
+          onChange={(e) => { setSelectedSubMenu(e.target.value); setPage(1); }}
+          className="px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white"
+        >
+          <option value="">All Sub Menus</option>
+          {subMenus.filter(sm => !selectedMenu || sm.menuId?._id === selectedMenu).map((sm) => (
+            <option key={sm._id} value={sm._id}>{sm.name}</option>
+          ))}
+        </select>
+      </div>
+
       <DataTable
         columns={columns}
         data={recipes}
@@ -94,6 +137,9 @@ const RecipeManagement = () => {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
+        loading={loading}
+        emptyTitle="No recipes found"
+        emptyDescription="Get started by creating your first recipe!"
         actions={(row) => (
           <>
             <button

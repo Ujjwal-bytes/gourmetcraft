@@ -1,4 +1,12 @@
-const MetricCard = ({ icon, label, value, color = 'emerald', delay = '' }) => {
+const MetricCard = ({
+  icon,
+  label,
+  value,
+  color = 'emerald',
+  delay = '',
+  trend,
+  trendUp = true
+}) => {
   const colorStyles = {
     emerald: {
       bg: 'bg-emerald-50',
@@ -32,16 +40,25 @@ const MetricCard = ({ icon, label, value, color = 'emerald', delay = '' }) => {
     <div
       className={`animate-fade-in ${delay} bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-300 hover:-translate-y-0.5`}
     >
-      <div className="flex items-center gap-4">
-        <div className={`${style.iconBg} ${style.iconText} p-3 rounded-xl`}>
-          {icon}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <div className={`${style.iconBg} ${style.iconText} p-3 rounded-xl`}>
+            {icon}
+          </div>
+          <div>
+            <p className="text-sm font-medium text-gray-500">{label}</p>
+            <p className={`text-2xl font-bold ${style.valueText} mt-0.5`}>
+              {value !== undefined && value !== null ? value : '—'}
+            </p>
+          </div>
         </div>
-        <div>
-          <p className="text-sm font-medium text-gray-500">{label}</p>
-          <p className={`text-2xl font-bold ${style.valueText} mt-0.5`}>
-            {value !== undefined && value !== null ? value : '—'}
-          </p>
-        </div>
+        {trend && (
+          <div className={`flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold ${
+            trendUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-600'
+          }`}>
+            {trendUp ? '↑' : '↓'} {trend}
+          </div>
+        )}
       </div>
     </div>
   );

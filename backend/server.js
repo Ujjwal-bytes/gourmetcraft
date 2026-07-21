@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDB from './config/db.js';
 import errorHandler from './middleware/errorHandler.js';
+import rateLimit from 'express-rate-limit';
 
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
@@ -31,7 +32,24 @@ const app = express();
 app.use(express.json());
 
 // Enable CORS
-app.use(cors());
+const allowedOrigins = process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : [];
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  }
+}));
+
+// Rate limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5000, // Limit each IP to 5000 requests per `window` (here, per 15 minutes)
+  message: { success: false, message: 'Too many requests, please try again later.' }
+});
+app.use('/api', limiter);
 
 // Set security headers
 app.use(helmet());

@@ -16,7 +16,7 @@ const MenuManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMenu, setEditingMenu] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, id: null });
-  const [form, setForm] = useState({ name: '', description: '' });
+  const [form, setForm] = useState({ name: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -46,14 +46,14 @@ const MenuManagement = () => {
   };
 
   const openCreateModal = () => {
-    setForm({ name: '', description: '' });
+    setForm({ name: '' });
     setEditingMenu(null);
     setError('');
     setIsModalOpen(true);
   };
 
   const openEditModal = (menu) => {
-    setForm({ name: menu.name, description: menu.description || '' });
+    setForm({ name: menu.name });
     setEditingMenu(menu);
     setError('');
     setIsModalOpen(true);
@@ -99,12 +99,6 @@ const MenuManagement = () => {
     { header: 'Menu Name', accessor: 'name', render: (row) => (
       <span className="font-medium text-gray-900">{row.name}</span>
     )},
-    { header: 'Description', accessor: 'description', render: (row) => (
-      <span className="text-gray-500">{row.description || '—'}</span>
-    )},
-    { header: 'Created', render: (row) => (
-      <span className="text-gray-500">{new Date(row.createdAt).toLocaleDateString()}</span>
-    )},
   ];
 
   if (loading) {
@@ -141,6 +135,9 @@ const MenuManagement = () => {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
+        loading={loading}
+        emptyTitle="No menus found"
+        emptyDescription="Get started by creating your first menu!"
         actions={(row) => (
           <>
             <button
@@ -181,18 +178,6 @@ const MenuManagement = () => {
               onChange={(e) => setForm({ ...form, name: e.target.value })}
               placeholder="Enter menu name"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Description
-            </label>
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Enter description"
-              rows={3}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
             />
           </div>
           <div className="flex justify-end gap-3 pt-2">

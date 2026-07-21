@@ -17,7 +17,7 @@ const SubMenuManagement = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubMenu, setEditingSubMenu] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState({ isOpen: false, id: null });
-  const [form, setForm] = useState({ name: '', menuId: '', description: '' });
+  const [form, setForm] = useState({ name: '', menuId: '' });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
@@ -51,7 +51,7 @@ const SubMenuManagement = () => {
   };
 
   const openCreateModal = () => {
-    setForm({ name: '', menuId: '', description: '' });
+    setForm({ name: '', menuId: '' });
     setEditingSubMenu(null);
     setError('');
     setIsModalOpen(true);
@@ -61,7 +61,6 @@ const SubMenuManagement = () => {
     setForm({
       name: subMenu.name,
       menuId: subMenu.menuId?._id || '',
-      description: subMenu.description || '',
     });
     setEditingSubMenu(subMenu);
     setError('');
@@ -113,9 +112,6 @@ const SubMenuManagement = () => {
         {row.menuId?.name || '—'}
       </span>
     )},
-    { header: 'Description', render: (row) => (
-      <span className="text-gray-500">{row.description || '—'}</span>
-    )},
   ];
 
   if (loading) {
@@ -151,6 +147,9 @@ const SubMenuManagement = () => {
         currentPage={page}
         totalPages={totalPages}
         onPageChange={setPage}
+        loading={loading}
+        emptyTitle="No sub-menus found"
+        emptyDescription="Get started by creating your first sub-menu!"
         actions={(row) => (
           <>
             <button
@@ -204,18 +203,6 @@ const SubMenuManagement = () => {
                 <option key={menu._id} value={menu._id}>{menu.name}</option>
               ))}
             </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              Description
-            </label>
-            <textarea
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-              placeholder="Enter description"
-              rows={3}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent resize-none"
-            />
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button

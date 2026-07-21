@@ -1,6 +1,22 @@
-import { HiSearch } from 'react-icons/hi';
+import { HiSearch, HiInbox } from 'react-icons/hi';
+import { SkeletonTable } from './Skeleton';
 
-const DataTable = ({ columns, data, searchValue, onSearchChange, searchPlaceholder, actions, ...props }) => {
+const DataTable = ({
+  columns,
+  data,
+  searchValue,
+  onSearchChange,
+  searchPlaceholder,
+  actions,
+  loading = false,
+  emptyTitle = "No records found",
+  emptyDescription = "Try adjusting your search or filters to find what you're looking for.",
+  ...props
+}) => {
+  if (loading) {
+    return <SkeletonTable columns={columns.length + (actions ? 1 : 0)} rows={5} />;
+  }
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
       {/* Search Bar */}
@@ -23,7 +39,7 @@ const DataTable = ({ columns, data, searchValue, onSearchChange, searchPlacehold
       <div className="overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="bg-gray-50/80">
+            <tr className="bg-gray-50/80 sticky top-0 z-10">
               {columns.map((col, idx) => (
                 <th
                   key={idx}
@@ -47,9 +63,9 @@ const DataTable = ({ columns, data, searchValue, onSearchChange, searchPlacehold
                   className="px-6 py-16 text-center"
                 >
                   <div className="flex flex-col items-center justify-center text-gray-400">
-                    <HiSearch className="w-10 h-10 mb-3 text-gray-300" />
-                    <p className="text-sm font-medium text-gray-600">No records found</p>
-                    <p className="text-xs text-gray-400 mt-1">Try adjusting your search or filters to find what you're looking for.</p>
+                    <HiInbox className="w-12 h-12 mb-4 text-gray-300" />
+                    <p className="text-base font-medium text-gray-700">{emptyTitle}</p>
+                    <p className="text-sm text-gray-500 mt-1">{emptyDescription}</p>
                   </div>
                 </td>
               </tr>
@@ -91,14 +107,14 @@ const DataTable = ({ columns, data, searchValue, onSearchChange, searchPlacehold
             <button
               disabled={props.currentPage <= 1}
               onClick={() => props.onPageChange(props.currentPage - 1)}
-              className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Prev
             </button>
             <button
               disabled={props.currentPage >= props.totalPages}
               onClick={() => props.onPageChange(props.currentPage + 1)}
-              className="px-3 py-1 text-sm border rounded-lg hover:bg-gray-50 disabled:opacity-50"
+              className="px-4 py-2 text-sm font-medium border border-gray-200 rounded-xl hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               Next
             </button>

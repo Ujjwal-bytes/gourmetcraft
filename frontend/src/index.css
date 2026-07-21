@@ -23,6 +23,207 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Print Styles */
+@media print {
+  /* ===== HIDE UI ELEMENTS ===== */
+  .no-print {
+    display: none !important;
+  }
+
+  /* ===== RESET PAGE LAYOUT ===== */
+  body, html {
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    color: black !important;
+    height: auto !important;
+    overflow: visible !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+
+  /* ===== OVERRIDE LAYOUT ===== */
+  .flex.h-screen {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .overflow-hidden {
+    overflow: visible !important;
+  }
+
+  .min-h-screen {
+    min-height: auto !important;
+  }
+
+  /* ===== PAGE SETUP ===== */
+  @page {
+    size: A4;
+    margin: 10mm !important;
+  }
+
+  /* ===== PRINT CONTENT ===== */
+  .print-content {
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 5mm !important;
+    margin: 0 !important;
+    /* REMOVE transform: scale() completely */
+  }
+
+  /* ===== OVERRIDE CONTAINERS ===== */
+  .print-content .container,
+  .print-content .max-w-7xl,
+  .print-content .mx-auto {
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    width: 100% !important;
+  }
+
+  /* ===== FIX PADDING ===== */
+  .print-content > * {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* ===== FONT SIZES - READABLE ===== */
+  .print-content h1 {
+    font-size: 18pt !important;
+  }
+  .print-content h2 {
+    font-size: 15pt !important;
+  }
+  .print-content h3 {
+    font-size: 12pt !important;
+  }
+  .print-content p {
+    font-size: 10pt !important;
+  }
+  .print-content .text-3xl {
+    font-size: 18pt !important;
+  }
+  .print-content .text-2xl {
+    font-size: 15pt !important;
+  }
+  .print-content .text-xl {
+    font-size: 13pt !important;
+  }
+  .print-content .text-lg {
+    font-size: 11pt !important;
+  }
+  .print-content .text-base {
+    font-size: 10pt !important;
+  }
+  .print-content .text-sm {
+    font-size: 9pt !important;
+  }
+  .print-content .text-xs {
+    font-size: 8pt !important;
+  }
+
+  /* ===== TABLES ===== */
+  .print-content table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    font-size: 8.5pt !important;
+  }
+
+  .print-content th,
+  .print-content td {
+    border: 0.5pt solid #d1d5db !important;
+    padding: 2mm 3mm !important;
+    text-align: left !important;
+    vertical-align: top !important;
+  }
+
+  .print-content th {
+    background-color: #f9fafb !important;
+    font-weight: 600 !important;
+    font-size: 8.5pt !important;
+  }
+
+  /* ===== REMOVE SHADOWS ===== */
+  .shadow-sm, .shadow-md, .shadow-lg {
+    box-shadow: none !important;
+  }
+
+  /* ===== REMOVE ROUNDED CORNERS ===== */
+  .rounded-lg, .rounded-xl, .rounded-2xl {
+    border-radius: 0 !important;
+  }
+
+  /* ===== SIMPLIFY BORDERS ===== */
+  .border, .border-gray-200, .border-gray-100 {
+    border: 0.5pt solid #d1d5db !important;
+  }
+
+  /* ===== BACKGROUND COLORS ===== */
+  .bg-gray-50, .bg-amber-50, .bg-orange-50, .bg-green-50 {
+    background-color: #f9fafb !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ===== ENSURE BACKGROUND PRINT ===== */
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* ===== HIDE SCROLLBARS ===== */
+  ::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  /* ===== PAGE BREAKS ===== */
+  .page-break {
+    page-break-before: always !important;
+  }
+
+  /* ===== AVOID PAGE BREAKS INSIDE ===== */
+  tr, td, th, thead, tbody, div, section, article {
+    page-break-inside: avoid !important;
+  }
+
+  /* ===== REMOVE EXCESS SPACING ===== */
+  .print-content .space-y-6 > * + * {
+    margin-top: 2mm !important;
+  }
+  .print-content .space-y-4 > * + * {
+    margin-top: 1.5mm !important;
+  }
+  .print-content .mb-6 {
+    margin-bottom: 2mm !important;
+  }
+  .print-content .mb-4 {
+    margin-bottom: 1.5mm !important;
+  }
+  .print-content .mb-3 {
+    margin-bottom: 1mm !important;
+  }
+  .print-content .gap-4 {
+    gap: 1.5mm !important;
+  }
+  .print-content .gap-2 {
+    gap: 1mm !important;
+  }
+  .print-content .p-6 {
+    padding: 2mm !important;
+  }
+  .print-content .p-4 {
+    padding: 1.5mm !important;
+  }
+  .print-content .p-2 {
+    padding: 1mm !important;
+  }
+  .print-content .p-1 {
+    padding: 0.5mm !important;
+  }
+}
+
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;

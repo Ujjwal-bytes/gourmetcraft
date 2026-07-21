@@ -26,7 +26,7 @@ const Header = ({ onToggleSidebar, pageTitle }) => {
     'Dashboard';
 
   return (
-    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100">
+    <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 no-print">
       <div className="flex items-center justify-between px-4 sm:px-6 py-3.5">
         <div className="flex items-center gap-3">
           <button
